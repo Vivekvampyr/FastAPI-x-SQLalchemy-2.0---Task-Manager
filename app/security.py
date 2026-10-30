@@ -2,9 +2,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Optional, Any
 import bcrypt
 import jwt
-
-SECRET_KEY = "jigh13uigj31unv1350gbiurn432v492yvbin132079gb1vn37"
-ALGORITHM = "HS256"
+from app.config import settings
 
 def hash_password(password: str):
     pwd_bytes = password.encode('utf-8')
@@ -24,4 +22,4 @@ def create_access_token(data: dict[str, Any], expires_delta: Optional[timedelta]
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + (expires_delta if expires_delta else timedelta(minutes=15))
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
