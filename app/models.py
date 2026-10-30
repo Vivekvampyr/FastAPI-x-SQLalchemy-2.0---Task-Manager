@@ -2,7 +2,7 @@ import enum
 from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Optional, List
-from sqlalchemy import String, Integer, Numeric, DateTime, ForeignKey, Enum, Text
+from sqlalchemy import String, Integer, Numeric, DateTime, ForeignKey, Enum, Text, Boolean, true
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .database import Base
 
@@ -18,18 +18,19 @@ class TransactionTypeEnum(str, enum.Enum):
 class User(Base):
     __tablename__ = "users"
 
-    id = Mapped[int] = mapped_column(primary_key=True,index=True)
-    username = Mapped[str] = mapped_column(String(50), unique=True,index=True,nullable=False)
-    email = Mapped[str] = mapped_column(String(120), unique=True, index=True, nullable=False)
-    hashed_password = Mapped[str] = mapped_column(String(255), nullable=False)
-    role = Mapped[RoleEnum] = mapped_column(default=True)
-    created_at = Mapped[datetime] = mapped_column(DateTime(timezone=True), default= lambda: datetime.now(timezone.utc))
-    transactions = Mapped[List["StockTransaction"]] = relationship(back_populates="user")
+    id: Mapped[int] = mapped_column(primary_key=True,index=True)
+    username: Mapped[str] = mapped_column(String(50), unique=True,index=True,nullable=False)
+    email: Mapped[str] = mapped_column(String(120), unique=True, index=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=true(), nullable=False)
+    role: Mapped[RoleEnum] = mapped_column(default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default= lambda: datetime.now(timezone.utc))
+    transactions: Mapped[List["StockTransaction"]] = relationship(back_populates="user")
 
 class Item(Base):
     __tablename__ = "items"
 
-    id = Mapped[int] = mapped_column(primary_key=True,index=True)
+    id: Mapped[int] = mapped_column(primary_key=True,index=True)
     sku: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
     name: Mapped[str] = mapped_column(String(200), index=True, nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
@@ -44,7 +45,7 @@ class Item(Base):
 class StockTransaction(Base):
     __tablename__ = "stock_transactions"
 
-    id = Mapped[int] = mapped_column(primary_key=True,index=True)
+    id: Mapped[int] = mapped_column(primary_key=True,index=True)
     item_id: Mapped[int] = mapped_column(ForeignKey("items.id", ondelete="CASCADE"), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False)
