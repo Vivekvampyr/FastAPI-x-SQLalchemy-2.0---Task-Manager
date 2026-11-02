@@ -1,16 +1,19 @@
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from app.database import get_db
 from app.models import Item, RoleEnum, User
 from app.schemas import ItemCreate, ItemUpdate, ItemOut
 from app.dependencies import get_current_user, RequireRoles
+from ..core.rate_limiter import limiter
 
 router = APIRouter(prefix="/api/items", tags=["Items"])
 
 @router.get("/", response_model=List[ItemOut])
+@limiter.limit("100/hour;5/minute")
 def list_items(
+    request: Request,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
     low_stock: Optional[bool] = False,
