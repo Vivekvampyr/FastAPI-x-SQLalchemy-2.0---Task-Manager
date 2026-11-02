@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routers import auth, items, inventory
+from .routers import auth, items 
 from .database import Base, engine
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -17,8 +17,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.include_router(auth.router)
 app.include_router(items.router)
-app.include_router(inventory.router)
 
 @app.get("/")
 def root():
-    return {"message": "Welcome to Inventory Management Enterprise API"}
+    return {"message": "Welcome to FastAPI RESTful API"}
